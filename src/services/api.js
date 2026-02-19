@@ -318,3 +318,127 @@ export async function customerDocumentsUpload(
     };
   }
 }
+
+/**
+ * Get product type – user/get_product_type
+ * @param {{ invoice_number: string, metal_type: string }} params
+ * @param {{ token?: string }} options
+ * @returns {Promise<{ success: boolean, data?: any, message?: string }>}
+ */
+export async function getProductType({invoice_number, metal_type}, options = {}) {
+  const apiName = 'user/get_product_type';
+  const url = buildUrl(apiName);
+  const body = {invoice_number, metal_type};
+
+  logRequest(apiName, url, 'POST', body);
+
+  try {
+    const headers = {'Content-Type': 'application/x-www-form-urlencoded'};
+    if (options.token) headers['Authorization'] = `Bearer ${options.token}`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: new URLSearchParams(body).toString(),
+    });
+    const data = await response.json().catch(() => ({}));
+    logResponse(apiName, response.status, data, response.ok);
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: data.message || data.error || `Request failed (${response.status})`,
+      };
+    }
+    return {success: true, data: data.data ?? data};
+  } catch (e) {
+    console.log(`${LOG_PREFIX} ERROR ${apiName}`, e.message);
+    return {
+      success: false,
+      message: e.message || 'Network error. Please try again.',
+    };
+  }
+}
+
+/**
+ * Upload product images – user/upload_product_images
+ * @param {{ invoice_number: string, products: Array<{product_id: string|number, product_name: string, type: string, metal_name: string}>, imageFiles: Array<Array<{uri: string, type?: string, name?: string}>> }} params
+ * @param {{ token?: string }} options
+ * @returns {Promise<{ success: boolean, data?: any, message?: string }>}
+ */
+export async function uploadProductImages({invoice_number, products, imageFiles}, options = {}) {
+  const apiName = 'user/upload_product_images';
+  const url = buildUrl(apiName);
+
+  const formData = new FormData();
+  formData.append('invoice_number', invoice_number);
+
+  // Add products array
+  products.forEach((product, index) => {
+    formData.append(`products[${index}][product_id]`, String(product.product_id));
+    formData.append(`products[${index}][product_name]`, product.product_name);
+    formData.append(`products[${index}][type]`, product.type); // module: gram or piece
+    formData.append(`products[${index}][metal_name]`, product.metal_name); // metal: gold or silver
+  });
+
+  // Add image files
+  imageFiles.forEach((images, productIndex) => {
+    images.forEach((imageFile) => {
+      if (imageFile?.uri) {
+        formData.append(`image_files_${productIndex}[]`, {
+          uri: imageFile.uri,
+          type: imageFile.type || 'image/jpeg',
+          name: imageFile.name || `product_${productIndex}_${Date.now()}.jpg`,
+        });
+      }
+    });
+  });
+
+  // Detailed console log for FormData structure
+  console.log(`${LOG_PREFIX} FormData Structure:`);
+  console.log(`invoice_number: ${invoice_number}`);
+  products.forEach((product, index) => {
+    console.log(`products[${index}][product_id]: ${product.product_id}`);
+    console.log(`products[${index}][product_name]: ${product.product_name}`);
+    console.log(`products[${index}][type]: ${product.type}`);
+    console.log(`products[${index}][metal_name]: ${product.metal_name}`);
+    console.log(`image_files_${index}[]: ${imageFiles[index]?.length || 0} file(s)`);
+  });
+
+  logRequest(apiName, url, 'POST', {
+    invoice_number,
+    products_count: products.length,
+    image_files_count: imageFiles.length,
+  });
+
+  try {
+    const headers = {};
+    if (options.token) headers['Authorization'] = `Bearer ${options.token}`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+    const data = await response.json().catch(() => ({}));
+    
+    // Detailed console log for response
+    console.log(`${LOG_PREFIX} [${apiName}] Response Details:`);
+    console.log(`Status: ${response.status} ${response.ok ? 'OK' : 'ERROR'}`);
+    console.log('Response Data:', JSON.stringify(data, null, 2));
+    
+    logResponse(apiName, response.status, data, response.ok);
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: data.message || data.error || `Request failed (${response.status})`,
+      };
+    }
+    return {success: true, data: data.data ?? data};
+  } catch (e) {
+    console.log(`${LOG_PREFIX} ERROR ${apiName}`, e.message);
+    return {
+      success: false,
+      message: e.message || 'Network error. Please try again.',
+    };
+  }
+}

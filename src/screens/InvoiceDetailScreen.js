@@ -159,58 +159,78 @@ const InvoiceDetailScreen = ({route, navigation}) => {
         <Text style={styles.heroDate}>{invoice.date || ''}</Text>
       </View>
 
-      {/* Customer card */}
-      <Card title="Customer" icon="👤">
-        <Row label="Name" value={customer.name} />
-        <Row label="Phone" value={customer.phone} />
-        <Row label="Address" value={customer.address} />
-      </Card>
+      {/* Customer and Amounts cards in one row */}
+      <View style={styles.cardsRow}>
+        <View style={[styles.halfCard, styles.halfCardFirst]}>
+          <Card title="Customer" icon="👤">
+            <Row label="Name" value={customer.name} />
+            <Row label="Phone" value={customer.phone} />
+            <Row label="Address" value={customer.address} />
+          </Card>
+        </View>
+        <View style={[styles.halfCard, styles.halfCardLast]}>
+          <Card title="Amounts" icon="💰">
+            <Row label="Final total" value={amounts.final_total} />
+            <Row label="Paid amount" value={amounts.paid_amount} />
+            <Row label="Last balance" value={amounts.last_balance} />
+            <Row label="Discount" value={amounts.discount} />
+            <Row label="Total VAT" value={amounts.total_vat} />
+          </Card>
+        </View>
+      </View>
 
-      {/* Amounts card */}
-      <Card title="Amounts" icon="💰">
-        <Row label="Final total" value={amounts.final_total} />
-        <Row label="Paid amount" value={amounts.paid_amount} />
-        <Row label="Last balance" value={amounts.last_balance} />
-        <Row label="Discount" value={amounts.discount} />
-        <Row label="Total VAT" value={amounts.total_vat} />
-      </Card>
-
-      {/* Payment card */}
-      <Card title="Payment" icon="💳">
-        {paymentMethods.length > 0
-          ? paymentMethods.map((item, index) => (
+      {/* Payment and Progress cards in one row */}
+      {steps.current_step != null ? (
+        <View style={styles.cardsRow}>
+          <View style={[styles.halfCard, styles.halfCardFirst]}>
+            <Card title="Payment" icon="💳">
+              {paymentMethods.length > 0
+                ? paymentMethods.map((item, index) => (
+                    <Row
+                      key={`payment-${index}`}
+                      label={item.method || `Payment ${index + 1}`}
+                      value={item.amount}
+                    />
+                  ))
+                : <Row label="Mode" value={payment.payment_mode} />}
+            </Card>
+          </View>
+          <View style={[styles.halfCard, styles.halfCardLast]}>
+            <Card title="Progress" icon="📋">
               <Row
-                key={`payment-${index}`}
-                label={item.method || `Payment ${index + 1}`}
-                value={item.amount}
+                label="Status"
+                value={steps.is_completed ? 'Completed' : 'In progress'}
               />
-            ))
-          : <Row label="Mode" value={payment.payment_mode} />}
-      </Card>
-
-      {steps.current_step != null && (
-        <Card title="Progress" icon="📋">
-          <Row
-            label="Step"
-            value={`${steps.current_step} • ${steps.is_completed ? 'Completed' : 'In progress'}`}
-          />
+              {pdfUrl ? (
+                <>
+                  <View style={styles.sectionDivider} />
+                  <Text style={styles.sectionHeading}>Invoice PDF</Text>
+                  <Text style={styles.pdfCardHint}>View the full invoice document.</Text>
+                  <TouchableOpacity
+                    style={styles.pdfButton}
+                    onPress={openPdfInApp}
+                    activeOpacity={0.85}>
+                    <Text style={styles.pdfButtonIcon}>📄</Text>
+                    <Text style={styles.pdfButtonText}>View Invoice PDF</Text>
+                  </TouchableOpacity>
+                </>
+              ) : null}
+            </Card>
+          </View>
+        </View>
+      ) : (
+        <Card title="Payment" icon="💳">
+          {paymentMethods.length > 0
+            ? paymentMethods.map((item, index) => (
+                <Row
+                  key={`payment-${index}`}
+                  label={item.method || `Payment ${index + 1}`}
+                  value={item.amount}
+                />
+              ))
+            : <Row label="Mode" value={payment.payment_mode} />}
         </Card>
       )}
-
-      {/* PDF in-app */}
-      {pdfUrl ? (
-        <View style={styles.pdfCard}>
-          <Text style={styles.cardTitle}>Invoice PDF</Text>
-          <Text style={styles.pdfCardHint}>View the full invoice document.</Text>
-          <TouchableOpacity
-            style={styles.pdfButton}
-            onPress={openPdfInApp}
-            activeOpacity={0.85}>
-            <Text style={styles.pdfButtonIcon}>📄</Text>
-            <Text style={styles.pdfButtonText}>View Invoice PDF</Text>
-          </TouchableOpacity>
-        </View>
-      ) : null}
 
       {/* Next step or completed */}
       <View style={styles.footer}>
@@ -344,11 +364,26 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.9)',
     marginTop: 4,
   },
+  cardsRow: {
+    flexDirection: 'row',
+    marginBottom: 14,
+    alignItems: 'stretch',
+  },
+  halfCard: {
+    flex: 1,
+  },
+  halfCardFirst: {
+    marginRight: 7,
+  },
+  halfCardLast: {
+    marginLeft: 7,
+  },
   card: {
     backgroundColor: Colors.white,
     borderRadius: CARD_RADIUS,
     padding: CARD_PADDING,
-    marginBottom: 14,
+    marginBottom: 0,
+    flex: 1,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
@@ -395,20 +430,17 @@ const styles = StyleSheet.create({
     flex: 0.62,
     textAlign: 'right',
   },
-  pdfCard: {
-    backgroundColor: Colors.white,
-    borderRadius: CARD_RADIUS,
-    padding: CARD_PADDING,
-    marginBottom: 14,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: {width: 0, height: 2},
-        shadowOpacity: 0.06,
-        shadowRadius: 8,
-      },
-      android: {elevation: 3},
-    }),
+  sectionDivider: {
+    marginTop: 16,
+    marginBottom: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#EEEEEE',
+  },
+  sectionHeading: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: Colors.textPrimary,
+    marginBottom: 8,
   },
   pdfCardHint: {
     fontSize: 13,
