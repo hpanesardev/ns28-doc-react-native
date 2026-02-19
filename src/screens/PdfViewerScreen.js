@@ -37,7 +37,7 @@ const PdfViewerScreen = ({route, navigation}) => {
   // If it's an image, display it directly
   if (isImage) {
     return (
-      <View style={styles.container}>
+      <View style={styles.imageViewContainer}>
         <ScrollView
           style={styles.imageContainer}
           contentContainerStyle={styles.imageContent}
@@ -53,14 +53,14 @@ const PdfViewerScreen = ({route, navigation}) => {
           />
         </ScrollView>
         {loading && (
-          <View style={styles.loadingWrap}>
+          <View style={styles.imageLoadingWrap}>
             <ActivityIndicator size="large" color={Colors.primary} />
-            <Text style={styles.loadingText}>Loading image…</Text>
+            <Text style={styles.imageLoadingText}>Loading image…</Text>
           </View>
         )}
         {error && (
-          <View style={styles.errorWrap}>
-            <Text style={styles.errorText}>Could not load image.</Text>
+          <View style={styles.imageErrorWrap}>
+            <Text style={styles.imageErrorText}>Could not load image.</Text>
             <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
               <Text style={styles.backBtnText}>Back</Text>
             </TouchableOpacity>
@@ -131,6 +131,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#525659',
   },
+  imageViewContainer: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
   webview: {
     flex: 1,
     width,
@@ -185,7 +189,7 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#FFFFFF',
   },
   imageContent: {
     flex: 1,
@@ -195,6 +199,30 @@ const styles = StyleSheet.create({
   image: {
     width: width,
     height: height,
+  },
+  imageLoadingWrap: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  imageLoadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: Colors.textPrimary,
+  },
+  imageErrorWrap: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  imageErrorText: {
+    fontSize: 16,
+    color: Colors.textPrimary,
+    marginBottom: 20,
+    textAlign: 'center',
   },
 });
 

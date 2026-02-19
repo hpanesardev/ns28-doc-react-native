@@ -126,10 +126,11 @@ const AgreementPreviewScreen = ({route, navigation}) => {
               webviewStyle={styles.signatureWebView}
               style={styles.signatureCanvas}
               backgroundColor="#FFFFFF"
-              penColor="#1A1A1A"
-              trimWhitespace={true}
+              penColor="#000000"
+              trimWhitespace={false}
               imageType="image/jpeg"
-              webStyle="body,html{background:#FFFFFF !important; margin:0; padding:0;} canvas{background:#FFFFFF !important; border:none !important; display:block;}"
+              dataURL="image/jpeg"
+              webStyle="body,html{background:#FFFFFF !important; margin:0; padding:0;} canvas{background:#FFFFFF !important; border:none !important; display:block; background-color:#FFFFFF !important;}"
             />
           </View>
           <View style={styles.signatureActionsRow}>
