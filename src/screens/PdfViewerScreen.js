@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   Dimensions,
   Platform,
+  Image,
+  ScrollView,
 } from 'react-native';
 import {WebView} from 'react-native-webview';
 import {Colors} from '../constants';
@@ -21,7 +23,7 @@ const PdfViewerScreen = ({route, navigation}) => {
   if (!url) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.errorText}>No PDF URL provided.</Text>
+        <Text style={styles.errorText}>No URL provided.</Text>
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
           <Text style={styles.backBtnText}>Back</Text>
         </TouchableOpacity>
@@ -29,6 +31,46 @@ const PdfViewerScreen = ({route, navigation}) => {
     );
   }
 
+  // Check if URL is an image
+  const isImage = /\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(url) || url.includes('image');
+
+  // If it's an image, display it directly
+  if (isImage) {
+    return (
+      <View style={styles.container}>
+        <ScrollView
+          style={styles.imageContainer}
+          contentContainerStyle={styles.imageContent}
+          maximumZoomScale={5}
+          minimumZoomScale={1}>
+          <Image
+            source={{uri: url}}
+            style={styles.image}
+            resizeMode="contain"
+            onLoadStart={() => setLoading(true)}
+            onLoadEnd={() => setLoading(false)}
+            onError={() => setError(true)}
+          />
+        </ScrollView>
+        {loading && (
+          <View style={styles.loadingWrap}>
+            <ActivityIndicator size="large" color={Colors.primary} />
+            <Text style={styles.loadingText}>Loading image…</Text>
+          </View>
+        )}
+        {error && (
+          <View style={styles.errorWrap}>
+            <Text style={styles.errorText}>Could not load image.</Text>
+            <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+              <Text style={styles.backBtnText}>Back</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+    );
+  }
+
+  // For PDFs, use WebView
   const encodedUrl = encodeURIComponent(url);
   const viewerHtml = `
     <!DOCTYPE html>
@@ -140,6 +182,19 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontSize: 16,
     fontWeight: '600',
+  },
+  imageContainer: {
+    flex: 1,
+    backgroundColor: '#000',
+  },
+  imageContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  image: {
+    width: width,
+    height: height,
   },
 });
 

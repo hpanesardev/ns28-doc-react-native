@@ -9,6 +9,7 @@ import {
   Dimensions,
   ActivityIndicator,
   Platform,
+  Image,
 } from 'react-native';
 import {Colors} from '../constants';
 import {getAgreementPreview, getInvoiceDetails} from '../services/api';
@@ -45,9 +46,13 @@ const InvoiceDetailScreen = ({route, navigation}) => {
   const amounts = invoice.amounts ?? {};
   const payment = invoice.payment ?? {};
   const steps = invoice.steps ?? {};
+  const agreement = invoice.agreement ?? {};
+  const documents = invoice.documents ?? {};
+  const productImages = invoice.product_images ?? [];
   const pdfUrl = invoice.pdf_url || invoice.qr_code;
   const invoiceNumber = invoice.invoice_number;
   const isStepIncomplete = steps?.is_completed === false;
+  const isCompleted = steps?.is_completed === true;
   const [loadingAgreement, setLoadingAgreement] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -121,6 +126,17 @@ const InvoiceDetailScreen = ({route, navigation}) => {
     navigation.navigate('PdfViewer', {url, title: `Invoice ${invoice.invoice_number || ''}`});
   };
 
+  const openAgreementPdf = () => {
+    const url = agreement.pdf_url?.trim();
+    if (!url) return;
+    navigation.navigate('PdfViewer', {url, title: `Agreement ${invoice.invoice_number || ''}`});
+  };
+
+  const openDocumentImage = (imageUrl, title) => {
+    if (!imageUrl) return;
+    navigation.navigate('PdfViewer', {url: imageUrl, title});
+  };
+
   const statusLabel = invoice.status_label || '';
   const isPaid = /bezahlt|paid|complete/i.test(statusLabel);
 
@@ -179,57 +195,136 @@ const InvoiceDetailScreen = ({route, navigation}) => {
         </View>
       </View>
 
-      {/* Payment and Progress cards in one row */}
-      {steps.current_step != null ? (
-        <View style={styles.cardsRow}>
-          <View style={[styles.halfCard, styles.halfCardFirst]}>
-            <Card title="Payment" icon="💳">
-              {paymentMethods.length > 0
-                ? paymentMethods.map((item, index) => (
-                    <Row
-                      key={`payment-${index}`}
-                      label={item.method || `Payment ${index + 1}`}
-                      value={item.amount}
-                    />
-                  ))
-                : <Row label="Mode" value={payment.payment_mode} />}
-            </Card>
-          </View>
-          <View style={[styles.halfCard, styles.halfCardLast]}>
-            <Card title="Progress" icon="📋">
+      {/* Payment card */}
+      <Card title="Payment" icon="💳">
+        {paymentMethods.length > 0
+          ? paymentMethods.map((item, index) => (
               <Row
-                label="Status"
-                value={steps.is_completed ? 'Completed' : 'In progress'}
+                key={`payment-${index}`}
+                label={item.method || `Payment ${index + 1}`}
+                value={item.amount}
               />
-              {pdfUrl ? (
-                <>
-                  <View style={styles.sectionDivider} />
-                  <Text style={styles.sectionHeading}>Invoice PDF</Text>
-                  <Text style={styles.pdfCardHint}>View the full invoice document.</Text>
-                  <TouchableOpacity
-                    style={styles.pdfButton}
-                    onPress={openPdfInApp}
-                    activeOpacity={0.85}>
-                    <Text style={styles.pdfButtonIcon}>📄</Text>
-                    <Text style={styles.pdfButtonText}>View Invoice PDF</Text>
-                  </TouchableOpacity>
-                </>
-              ) : null}
-            </Card>
-          </View>
+            ))
+          : <Row label="Mode" value={payment.payment_mode} />}
+      </Card>
+
+      {/* Progress card - shown below Payment */}
+      {steps.current_step != null && (
+        <View style={styles.cardSpacing}>
+          <Card title="Progress" icon="📋">
+          <Row
+            label="Status"
+            value={steps.is_completed ? 'Completed' : 'In progress'}
+          />
+          {pdfUrl ? (
+            <>
+              <View style={styles.sectionDivider} />
+              <Text style={styles.sectionHeading}>Invoice PDF</Text>
+              <Text style={styles.pdfCardHint}>View the full invoice document.</Text>
+              <TouchableOpacity
+                style={styles.pdfButton}
+                onPress={openPdfInApp}
+                activeOpacity={0.85}>
+                <Text style={styles.pdfButtonIcon}>📄</Text>
+                <Text style={styles.pdfButtonText}>View Invoice PDF</Text>
+              </TouchableOpacity>
+            </>
+          ) : null}
+          {isCompleted && agreement.pdf_url ? (
+            <>
+              <View style={styles.sectionDivider} />
+              <Text style={styles.sectionHeading}>Agreement PDF</Text>
+              <Text style={styles.pdfCardHint}>View the signed agreement document.</Text>
+              <TouchableOpacity
+                style={styles.pdfButton}
+                onPress={openAgreementPdf}
+                activeOpacity={0.85}>
+                <Text style={styles.pdfButtonIcon}>📋</Text>
+                <Text style={styles.pdfButtonText}>View Agreement PDF</Text>
+              </TouchableOpacity>
+            </>
+          ) : null}
+          </Card>
         </View>
-      ) : (
-        <Card title="Payment" icon="💳">
-          {paymentMethods.length > 0
-            ? paymentMethods.map((item, index) => (
-                <Row
-                  key={`payment-${index}`}
-                  label={item.method || `Payment ${index + 1}`}
-                  value={item.amount}
-                />
-              ))
-            : <Row label="Mode" value={payment.payment_mode} />}
-        </Card>
+      )}
+
+      {/* Documents section - shown when completed */}
+      {isCompleted && (documents.front || documents.back) && (
+        <View style={styles.sectionSpacing}>
+          <Card title="Documents" icon="📄">
+          <View style={styles.documentsRow}>
+            {documents.front?.file_url && (
+              <TouchableOpacity
+                style={styles.documentButton}
+                onPress={() => openDocumentImage(documents.front.file_url, 'Document Front')}
+                activeOpacity={0.85}>
+                <Text style={styles.documentButtonText}>View Front</Text>
+              </TouchableOpacity>
+            )}
+            {documents.back?.file_url && (
+              <TouchableOpacity
+                style={styles.documentButton}
+                onPress={() => openDocumentImage(documents.back.file_url, 'Document Back')}
+                activeOpacity={0.85}>
+                <Text style={styles.documentButtonText}>View Back</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          </Card>
+        </View>
+      )}
+
+      {/* Product Images section - shown when completed */}
+      {isCompleted && productImages.length > 0 && (
+        <View style={styles.sectionSpacing}>
+          <Card title="Product Images" icon="🖼️">
+            {productImages.map((product, productIndex) => (
+              <View
+                key={productIndex}
+                style={[
+                  styles.productSection,
+                  productIndex === productImages.length - 1 && styles.productSectionLast,
+                ]}>
+                <View style={styles.productHeader}>
+                  <Text style={styles.productName}>{product.product_name}</Text>
+                  <View style={styles.productBadges}>
+                    <View style={styles.productBadge}>
+                      <Text style={styles.productBadgeText}>{product.metal_name}</Text>
+                    </View>
+                    <View style={styles.productBadge}>
+                      <Text style={styles.productBadgeText}>{product.type}</Text>
+                    </View>
+                  </View>
+                </View>
+                {product.images && product.images.length > 0 && (
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    style={styles.productImagesScroll}>
+                    {product.images.map((img, imgIndex) => (
+                      <TouchableOpacity
+                        key={imgIndex}
+                        style={styles.productImageWrapper}
+                        onPress={() =>
+                          openDocumentImage(
+                            img.image_url,
+                            `${product.product_name} - Image ${imgIndex + 1}`,
+                          )
+                        }
+                        activeOpacity={0.9}>
+                        <Image
+                          source={{uri: img.image_url}}
+                          style={styles.productImage}
+                          resizeMode="cover"
+                        />
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                )}
+              </View>
+            ))}
+          </Card>
+        </View>
       )}
 
       {/* Next step or completed */}
@@ -378,6 +473,9 @@ const styles = StyleSheet.create({
   halfCardLast: {
     marginLeft: 7,
   },
+  cardSpacing: {
+    marginTop: 14,
+  },
   card: {
     backgroundColor: Colors.white,
     borderRadius: CARD_RADIUS,
@@ -501,6 +599,94 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: Colors.success,
+  },
+  documentsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 8,
+  },
+  documentButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.primary,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    gap: 8,
+  },
+  documentButtonIcon: {
+    fontSize: 18,
+  },
+  documentButtonText: {
+    color: Colors.white,
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  sectionSpacing: {
+    marginTop: 16,
+  },
+  productSection: {
+    marginBottom: 20,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#EEEEEE',
+  },
+  productSectionLast: {
+    marginBottom: 0,
+    paddingBottom: 0,
+    borderBottomWidth: 0,
+  },
+  productHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  productName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.textPrimary,
+    flex: 1,
+  },
+  productBadges: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  productBadge: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  productBadgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: Colors.white,
+    textTransform: 'capitalize',
+  },
+  productImagesScroll: {
+    marginHorizontal: -4,
+  },
+  productImageWrapper: {
+    marginHorizontal: 4,
+    borderRadius: 8,
+    overflow: 'hidden',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {width: 0, height: 2},
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {elevation: 2},
+    }),
+  },
+  productImage: {
+    width: 120,
+    height: 120,
+    backgroundColor: Colors.lightGray,
   },
 });
 

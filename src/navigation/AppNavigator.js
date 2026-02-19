@@ -12,6 +12,7 @@ import InvoiceDetailScreen from '../screens/InvoiceDetailScreen';
 import AgreementPreviewScreen from '../screens/AgreementPreviewScreen';
 import DocumentUploadsScreen from '../screens/DocumentUploadsScreen';
 import UploadProductImagesScreen from '../screens/UploadProductImagesScreen';
+import UploadSuccessScreen from '../screens/UploadSuccessScreen';
 import PdfViewerScreen from '../screens/PdfViewerScreen';
 import {Colors} from '../constants';
 import {hasSeenSplashRef} from './navRefs';
@@ -102,6 +103,11 @@ function MainStack() {
         name="UploadProductImages"
         component={UploadProductImagesScreen}
         options={{title: 'Step 3 – Upload product images'}}
+      />
+      <Stack.Screen
+        name="UploadSuccess"
+        component={UploadSuccessScreen}
+        options={{title: 'Upload Complete', headerShown: false}}
       />
       <Stack.Screen
         name="PdfViewer"

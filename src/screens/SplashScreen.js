@@ -26,7 +26,7 @@ const SplashScreen = ({navigation}) => {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={Colors.primary} />
       <View style={styles.content}>
-        <Text style={styles.logo}>NS28</Text>
+        <Text style={styles.logo}>NM. Jewellery</Text>
         <Text style={styles.subtitle}>Doc Manager</Text>
         <ActivityIndicator
           size="large"

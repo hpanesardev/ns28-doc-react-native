@@ -169,9 +169,11 @@
 				807ECDD0D498F64809B40AB1 /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
+				B1C2D3E4F5A6B7C8D9E0F1A2 /* [RN] Bundle React Native code and images */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* [CP] Embed Pods Frameworks */,
 				5D38C74EE78C844727748F05 /* [CP] Copy Pods Resources */,
+				A1B2C3D4E5F6A7B8C9D0E1F2 /* [RN] Copy Hermes dSYM */,
 			);
 			buildRules = (
 			);
@@ -246,9 +248,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ns28-ipad/Pods-ns28-ipad-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ns28-ipad/Pods-ns28-ipad-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -263,9 +269,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ns28-ipad-ns28-ipadTests/Pods-ns28-ipad-ns28-ipadTests-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ns28-ipad-ns28-ipadTests/Pods-ns28-ipad-ns28-ipadTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -280,9 +290,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ns28-ipad/Pods-ns28-ipad-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ns28-ipad/Pods-ns28-ipad-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -341,13 +355,58 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ns28-ipad-ns28-ipadTests/Pods-ns28-ipad-ns28-ipadTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ns28-ipad-ns28-ipadTests/Pods-ns28-ipad-ns28-ipadTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
+			outputPaths = (
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ns28-ipad-ns28-ipadTests/Pods-ns28-ipad-ns28-ipadTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A1B2C3D4E5F6A7B8C9D0E1F2 /* [RN] Copy Hermes dSYM */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "[RN] Copy Hermes dSYM";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+			shellPath = /bin/sh;
+			shellScript = "set -e\n\n# Find Hermes dSYM in common locations\nHERMES_DSYM_PATHS=(\n  \"${PODS_ROOT}/hermes-engine/destroot/ios/framework/hermes.framework.dSYM\"\n  \"${PODS_ROOT}/hermes-engine/build_release/hermes.framework.dSYM\"\n  \"${BUILT_PRODUCTS_DIR}/hermes.framework.dSYM\"\n)\n\nHERMES_DSYM_PATH=\"\"\nfor path in \"${HERMES_DSYM_PATHS[@]}\"; do\n  if [ -d \"$path\" ]; then\n    HERMES_DSYM_PATH=\"$path\"\n    break\n  fi\ndone\n\nif [ -n \"$HERMES_DSYM_PATH\" ] && [ \"${CONFIGURATION}\" = \"Release\" ]; then\n  echo \"Copying Hermes dSYM to archive...\"\n  \n  # Get the archive dSYM folder\n  ARCHIVE_DSYM_DIR=\"${DWARF_DSYM_FOLDER_PATH}\"\n  \n  if [ -n \"$ARCHIVE_DSYM_DIR\" ] && [ -d \"$ARCHIVE_DSYM_DIR\" ]; then\n    # Copy Hermes dSYM to archive dSYM folder\n    cp -R \"$HERMES_DSYM_PATH\" \"$ARCHIVE_DSYM_DIR/\"\n    echo \"Hermes dSYM copied successfully to $ARCHIVE_DSYM_DIR\"\n  else\n    echo \"Warning: Archive dSYM folder not found: $ARCHIVE_DSYM_DIR\"\n  fi\nelse\n  if [ \"${CONFIGURATION}\" != \"Release\" ]; then\n    echo \"Skipping Hermes dSYM copy (not a Release build)\"\n  else\n    echo \"Warning: Hermes dSYM not found in any expected location\"\n  fi\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		B1C2D3E4F5A6B7C8D9E0F1A2 /* [RN] Bundle React Native code and images */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/../.xcode.env.local",
+				"${PODS_ROOT}/../.xcode.env",
+			);
+			name = "[RN] Bundle React Native code and images";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/react-native-xcode.sh-output.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\n\n# Navigate to ios directory\ncd \"${SRCROOT}\"\n\n# Set paths relative to ios directory\nWITH_ENVIRONMENT=\"../node_modules/react-native/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"../node_modules/react-native/scripts/react-native-xcode.sh\"\n\n# Check if files exist\nif [ ! -f \"$WITH_ENVIRONMENT\" ]; then\n  echo \"Error: $WITH_ENVIRONMENT not found\"\n  exit 1\nfi\n\nif [ ! -f \"$REACT_NATIVE_XCODE\" ]; then\n  echo \"Error: $REACT_NATIVE_XCODE not found\"\n  exit 1\nfi\n\n# Execute the bundle script\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -438,7 +497,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = HQ4W2HW8DB;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = "ns28-ipad/Info.plist";
@@ -467,7 +526,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = HQ4W2HW8DB;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = "ns28-ipad/Info.plist";
@@ -555,10 +614,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
@@ -624,10 +680,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;

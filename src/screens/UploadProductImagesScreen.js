@@ -297,15 +297,8 @@ const UploadProductImagesScreen = ({route, navigation}) => {
     setUploading(false);
 
     if (result.success) {
-      Alert.alert('Success', 'Product images uploaded successfully.', [
-        {
-          text: 'OK',
-          onPress: () => {
-            // Navigate back or to next step
-            navigation.goBack();
-          },
-        },
-      ]);
+      // Navigate to success screen
+      navigation.replace('UploadSuccess', {invoiceNumber});
     } else {
       Alert.alert('Upload failed', result.message || 'Could not upload product images.');
     }
