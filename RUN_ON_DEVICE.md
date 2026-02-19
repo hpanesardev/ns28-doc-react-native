@@ -13,14 +13,14 @@
    ```
    Keep this running in a terminal.
 
-3. **In a new terminal, run on device:**
+3. **In a new terminal, from the project root run on device:**
    ```bash
-   npm run ios -- --device
+   cd /path/to/ns28-ipad
+   npm run ios:device
    ```
-   
-   Or specify the device name:
+   Or specify the device name (use `--` so npm passes the flag to react-native):
    ```bash
-   npm run ios -- --device "Your iPad Name"
+   npm run ios -- --device "iPad"
    ```
 
 ## Method 2: Using Xcode (For Code Signing Setup)
@@ -48,6 +48,11 @@
    - Xcode will build and install on your iPad
 
 ## Troubleshooting
+
+### Stuck at "Installing and launching your app on iPad"
+- **Start Metro first.** In one terminal run `npm start` and wait until it shows "Metro waiting on…". Then in a **second terminal** run `npm run ios -- --device "iPad"` (from the project root, not from `ios/`).
+- **Use Xcode instead.** The CLI can hang on physical devices. Open `ios/ns28-ipad.xcworkspace` in Xcode, select your iPad as the run destination, then press **Cmd + R**. Build and launch happen in Xcode and the app will connect to Metro if it’s already running.
+- Ensure the iPad is **unlocked** and **trusted**; first install can take 1–2 minutes.
 
 ### Device Not Showing Up
 - Make sure iPad is unlocked

@@ -14,35 +14,34 @@ import {
   Image,
 } from 'react-native';
 import {Colors} from '../constants';
+import {useAuth} from '../context/AuthContext';
+import {login as loginApi} from '../services/api';
 
-const {width, height} = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 const isTablet = width >= 768;
 
 const LoginScreen = ({navigation}) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const {login: setAuth} = useAuth();
+  const [username, setUsername] = useState('info@prinzvirtualcoders.ch');
+  const [password, setPassword] = useState('12345678');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = () => {
-    if (!email.trim() || !password.trim()) {
+  const handleLogin = async () => {
+    if (!username.trim() || !password.trim()) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      Alert.alert('Success', 'Login successful!', [
-        {
-          text: 'OK',
-          onPress: () => {
-            // Navigate to home or dashboard screen here
-            // navigation.replace('Home');
-          },
-        },
-      ]);
-    }, 1500);
+    const result = await loginApi({username: username.trim(), password});
+    setIsLoading(false);
+
+    if (result.success) {
+      setAuth(result.data?.user ?? result.data, result.data?.token ?? null);
+      navigation.replace('Home');
+    } else {
+      Alert.alert('Login Failed', result.message || 'Please try again.');
+    }
   };
 
   return (
@@ -62,19 +61,17 @@ const LoginScreen = ({navigation}) => {
                 resizeMode="contain"
               />
             </View>
-            
           </View>
 
           <View style={styles.form}>
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Email</Text>
+              <Text style={styles.label}>Username</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Enter your email"
+                placeholder="Enter your username"
                 placeholderTextColor="#999"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
+                value={username}
+                onChangeText={setUsername}
                 autoCapitalize="none"
                 autoCorrect={false}
               />
@@ -100,10 +97,6 @@ const LoginScreen = ({navigation}) => {
               <Text style={styles.loginButtonText}>
                 {isLoading ? 'Signing in...' : 'Sign In'}
               </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.forgotPassword}>
-              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -140,17 +133,6 @@ const styles = StyleSheet.create({
   logoImage: {
     width: isTablet ? 500 : 200,
     height: isTablet ? 180 : 60,
-  },
-  title: {
-    fontSize: isTablet ? 42 : 32,
-    fontWeight: 'bold',
-    color: Colors.textPrimary,
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: isTablet ? 20 : 16,
-    color: Colors.textSecondary,
-    fontWeight: '300',
   },
   form: {
     width: '100%',
@@ -189,15 +171,6 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontSize: isTablet ? 18 : 16,
     fontWeight: '600',
-  },
-  forgotPassword: {
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  forgotPasswordText: {
-    color: Colors.primary,
-    fontSize: 14,
-    fontWeight: '500',
   },
 });
 

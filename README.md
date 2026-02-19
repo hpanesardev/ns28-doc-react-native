@@ -2,6 +2,16 @@
 
 A React Native CLI project configured for iOS and Android devices with real-time editing support.
 
+## API Endpoints
+
+- **Staging**: `http://prinzcoders.ch/stagingns28/api/`
+- **Live**: `https://prinzcoders.ch/ns28/api/`
+
+Defined in `src/constants/api.js`:
+- `API_BASE_URLS.staging`
+- `API_BASE_URLS.live`
+- `API_BASE_URL` (currently defaults to staging)
+
 ## Bundle ID / Package Name
 - **iOS Bundle ID**: `nmjewellery.pvccoders.ch`
 - **Android Package**: `nmjewellery.pvccoders.ch`
