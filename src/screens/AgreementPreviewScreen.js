@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Alert,
   Dimensions,
+  Platform,
 } from 'react-native';
 import {WebView} from 'react-native-webview';
 import SignatureCanvas from 'react-native-signature-canvas';
@@ -129,30 +130,49 @@ const AgreementPreviewScreen = ({route, navigation}) => {
               penColor="#000000"
               trimWhitespace={false}
               imageType="image/jpeg"
-              dataURL="image/jpeg"
+              dataURL=""
+              androidLayerType="software"
+              androidHardwareAccelerationDisabled={Platform.OS === 'android'}
+              scrollable={false}
+              nestedScrollEnabled={Platform.OS === 'android'}
+              webviewProps={
+                Platform.OS === 'android'
+                  ? {
+                      cacheEnabled: false,
+                      androidLayerType: 'software',
+                      androidHardwareAccelerationDisabled: true,
+                    }
+                  : {}
+              }
               webStyle="body,html{background:#FFFFFF !important; margin:0; padding:0;} canvas{background:#FFFFFF !important; border:none !important; display:block; background-color:#FFFFFF !important;}"
             />
           </View>
-          <View style={styles.signatureActionsRow}>
-            <TouchableOpacity style={styles.clearSignButton} onPress={handleClear}>
-              <Text style={styles.clearSignButtonText}>Clear sign</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.submitButton, isSubmitting && styles.submitButtonDisabled]}
-              onPress={() => {
-                if (isSubmitting) return;
-                if (!hasSignature) {
-                  Alert.alert('Signature required', 'Please draw your signature first.');
-                  return;
-                }
-                signatureRef.current?.readSignature();
-              }}
-              disabled={isSubmitting}>
-              <Text style={styles.submitButtonText}>
-                {isSubmitting ? 'Please wait...' : 'Sign & Continue'}
-              </Text>
-            </TouchableOpacity>
-          </View>
+        </View>
+        <View style={styles.signatureActionsRow}>
+          <TouchableOpacity 
+            style={styles.clearSignButton} 
+            onPress={handleClear}
+            activeOpacity={0.7}
+            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+            <Text style={styles.clearSignButtonText}>Clear sign</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.submitButton, isSubmitting && styles.submitButtonDisabled]}
+            onPress={() => {
+              if (isSubmitting) return;
+              if (!hasSignature) {
+                Alert.alert('Signature required', 'Please draw your signature first.');
+                return;
+              }
+              signatureRef.current?.readSignature();
+            }}
+            disabled={isSubmitting}
+            activeOpacity={0.7}
+            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+            <Text style={styles.submitButtonText}>
+              {isSubmitting ? 'Please wait...' : 'Sign & Continue'}
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
     </ScrollView>
@@ -263,9 +283,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 10,
-    marginHorizontal: 12,
-    marginBottom: 12,
+    marginTop: 16,
+    width: '60%',
+    alignSelf: 'center',
+    gap: 12,
   },
   clearSignButton: {
     paddingVertical: 10,

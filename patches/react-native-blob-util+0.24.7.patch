@@ -1,0 +1,63 @@
+diff --git a/node_modules/react-native-blob-util/android/src/main/java/com/ReactNativeBlobUtil/ReactNativeBlobUtilPackage.java b/node_modules/react-native-blob-util/android/src/main/java/com/ReactNativeBlobUtil/ReactNativeBlobUtilPackage.java
+index 3d74aa4..f5d173a 100644
+--- a/node_modules/react-native-blob-util/android/src/main/java/com/ReactNativeBlobUtil/ReactNativeBlobUtilPackage.java
++++ b/node_modules/react-native-blob-util/android/src/main/java/com/ReactNativeBlobUtil/ReactNativeBlobUtilPackage.java
+@@ -1,47 +1,27 @@
+ package com.ReactNativeBlobUtil;
+ 
+-import androidx.annotation.Nullable;
+-
+-import com.facebook.react.BaseReactPackage;
++import com.facebook.react.ReactPackage;
+ import com.facebook.react.bridge.NativeModule;
+ import com.facebook.react.bridge.ReactApplicationContext;
+-import com.facebook.react.module.model.ReactModuleInfo;
+-import com.facebook.react.module.model.ReactModuleInfoProvider;
++import com.facebook.react.uimanager.ViewManager;
+ 
+-import java.util.HashMap;
+-import java.util.Map;
++import java.util.ArrayList;
++import java.util.List;
+ 
+ // trick autolinking till it is fixed on RN side
+ //public class ReactNativeBlobUtilPackage extends TurboReactPackage {
+-public class ReactNativeBlobUtilPackage extends BaseReactPackage {
++public class ReactNativeBlobUtilPackage implements ReactPackage {
+ 
+-    @Nullable
+     @Override
+-    public NativeModule getModule(String name, ReactApplicationContext reactContext) {
+-        if (name.equals(ReactNativeBlobUtilImpl.NAME)) {
+-            return new ReactNativeBlobUtil(reactContext);
+-        } else {
+-            return null;
+-        }
++    public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
++        List<NativeModule> modules = new ArrayList<>();
++        modules.add(new ReactNativeBlobUtil(reactContext));
++        return modules;
+     }
+ 
+     @Override
+-    public ReactModuleInfoProvider getReactModuleInfoProvider() {
+-        return () -> {
+-            final Map<String, ReactModuleInfo> moduleInfos = new HashMap<>();
+-            boolean isTurboModule = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED;
+-            moduleInfos.put(
+-                    ReactNativeBlobUtilImpl.NAME,
+-                    new ReactModuleInfo(
+-                            ReactNativeBlobUtilImpl.NAME,
+-                            ReactNativeBlobUtilImpl.NAME,
+-                            false, // canOverrideExistingModule
+-                            false, // needsEagerInit
+-                            false, // isCxxModule
+-                            isTurboModule // isTurboModule
+-                    ));
+-            return moduleInfos;
+-        };
++    public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
++        return new ArrayList<>();
+     }
+ 
+ }
