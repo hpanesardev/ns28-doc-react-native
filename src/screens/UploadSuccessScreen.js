@@ -7,6 +7,7 @@ import {
   Dimensions,
   Platform,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import {Colors} from '../constants';
 import {getInvoiceDetails} from '../services/api';
 import {useAuth} from '../context/AuthContext';
@@ -51,7 +52,7 @@ const UploadSuccessScreen = ({route, navigation}) => {
     <View style={styles.container}>
       <View style={styles.content}>
         <View style={styles.iconContainer}>
-          <Text style={styles.successIcon}>✓</Text>
+          <Icon name="check" size={56} color={Colors.white} solid />
         </View>
         <Text style={styles.title}>Success!</Text>
         <Text style={styles.message}>
@@ -111,11 +112,6 @@ const styles = StyleSheet.create({
       },
       android: {elevation: 6},
     }),
-  },
-  successIcon: {
-    fontSize: 60,
-    color: Colors.white,
-    fontWeight: 'bold',
   },
   title: {
     fontSize: isTablet ? 32 : 28,

@@ -18,6 +18,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import ImageCropPicker from 'react-native-image-crop-picker';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import {Colors} from '../constants';
 import {useAuth} from '../context/AuthContext';
 import {getProductType, uploadProductImages} from '../services/api';
@@ -56,7 +57,8 @@ const UploadProductImagesScreen = ({route, navigation}) => {
             navigation.goBack();
           }}
           style={styles.backButton}>
-          <Text style={styles.backButtonText}>← Back</Text>
+          <Icon name="arrow-left" size={18} color={Colors.primary} style={styles.backButtonIcon} />
+          <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
       ),
     });
@@ -377,7 +379,7 @@ const UploadProductImagesScreen = ({route, navigation}) => {
                         ]}>
                         {product.productName || 'Select a product'}
                       </Text>
-                      <Text style={styles.dropdownArrow}>▼</Text>
+                      <Icon name="chevron-down" size={16} color={Colors.textSecondary} style={styles.dropdownArrow} />
                     </TouchableOpacity>
                     {product.productId && (
                       <Text style={styles.selectedText}>
@@ -428,7 +430,7 @@ const UploadProductImagesScreen = ({route, navigation}) => {
                       <TouchableOpacity
                         style={styles.imageRemoveButton}
                         onPress={() => removeImage(product.id, imgIdx)}>
-                        <Text style={styles.imageRemoveText}>×</Text>
+                        <Icon name="times" size={18} color={Colors.white} />
                       </TouchableOpacity>
                     </View>
                   ))}
@@ -513,7 +515,7 @@ const UploadProductImagesScreen = ({route, navigation}) => {
                     setSearchQuery('');
                   }}
                   style={styles.dropdownModalClose}>
-                  <Text style={styles.dropdownModalCloseText}>✕</Text>
+                  <Icon name="times" size={22} color={Colors.textPrimary} />
                 </TouchableOpacity>
               </View>
               {openDropdownId !== null && (
@@ -566,7 +568,7 @@ const UploadProductImagesScreen = ({route, navigation}) => {
                             ]}>
                             {pt.name || pt.product_name || 'Unknown Product'}
                           </Text>
-                          {isSelected && <Text style={styles.checkmark}>✓</Text>}
+                          {isSelected && <Icon name="check" size={18} color={Colors.white} solid style={styles.checkmarkIcon} />}
                         </TouchableOpacity>
                       );
                     }}
@@ -710,8 +712,6 @@ const styles = StyleSheet.create({
     color: Colors.textLight,
   },
   dropdownArrow: {
-    fontSize: 12,
-    color: Colors.textSecondary,
     marginLeft: 8,
   },
   emptyText: {
@@ -845,8 +845,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 8,
+  },
+  backButtonIcon: {
+    marginRight: 8,
   },
   backButtonText: {
     fontSize: 17,
@@ -929,10 +934,7 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontWeight: '600',
   },
-  checkmark: {
-    fontSize: 18,
-    color: Colors.white,
-    fontWeight: 'bold',
+  checkmarkIcon: {
     marginLeft: 12,
   },
   dropdownEmptyContainer: {

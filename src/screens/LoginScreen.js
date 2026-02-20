@@ -22,8 +22,10 @@ const isTablet = width >= 768;
 
 const LoginScreen = ({navigation}) => {
   const {login: setAuth} = useAuth();
-  const [username, setUsername] = useState('info@prinzvirtualcoders.ch');
-  const [password, setPassword] = useState('12345678');
+  // const [username, setUsername] = useState('info@prinzvirtualcoders.ch');
+  // const [password, setPassword] = useState('12345678');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {

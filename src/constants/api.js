@@ -4,4 +4,4 @@ export const API_BASE_URLS = {
 };
 
 // Default API target for development builds.
-export const API_BASE_URL = API_BASE_URLS.staging;
+export const API_BASE_URL = API_BASE_URLS.live;

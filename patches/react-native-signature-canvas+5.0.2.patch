@@ -1,0 +1,53 @@
+diff --git a/node_modules/react-native-signature-canvas/h5/js/app.js b/node_modules/react-native-signature-canvas/h5/js/app.js
+index e523ce6..c2bcba8 100755
+--- a/node_modules/react-native-signature-canvas/h5/js/app.js
++++ b/node_modules/react-native-signature-canvas/h5/js/app.js
+@@ -197,16 +197,39 @@ export default `
+             window.ReactNativeWebView && window.ReactNativeWebView.postMessage("EMPTY");
+         } else {
+             var imageType = '<%imageType%>' || 'image/png';
+-            var url = signaturePad.toDataURL(imageType);
+-
+-            if (trimWhitespace === true) {
+-                cropWhitespace(url);
++            var doExport = function () {
++                var url;
++                // JPEG does not support transparency; WebKit encodes transparent pixels as black.
++                // Composite onto an opaque white canvas first so we get white background.
++                if (imageType === 'image/jpeg') {
++                    var canvas = signaturePad.canvas;
++                    var w = canvas.width;
++                    var h = canvas.height;
++                    var off = document.createElement('canvas');
++                    off.width = w;
++                    off.height = h;
++                    var ctx = off.getContext('2d');
++                    ctx.fillStyle = '#FFFFFF';
++                    ctx.fillRect(0, 0, w, h);
++                    ctx.drawImage(canvas, 0, 0);
++                    url = off.toDataURL('image/jpeg');
++                } else {
++                    url = signaturePad.toDataURL(imageType);
++                }
++                if (trimWhitespace === true) {
++                    cropWhitespace(url);
++                } else {
++                    window.ReactNativeWebView && window.ReactNativeWebView.postMessage(url);
++                }
++                if (autoClear === true && signaturePad) {
++                    signaturePad.clear();
++                }
++            };
++            var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
++            if (isIOS) {
++                setTimeout(doExport, 100);
+             } else {
+-                window.ReactNativeWebView && window.ReactNativeWebView.postMessage(url);
+-            }
+-
+-            if (autoClear === true && signaturePad) {
+-                signaturePad.clear();
++                doExport();
+             }
+         }
+     }

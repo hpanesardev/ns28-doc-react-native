@@ -11,6 +11,7 @@ import {
   Platform,
   Image,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import {Colors} from '../constants';
 import {getAgreementPreview, getInvoiceDetails} from '../services/api';
 import {useAuth} from '../context/AuthContext';
@@ -29,10 +30,12 @@ const Row = ({label, value}) =>
     </View>
   ) : null;
 
-const Card = ({title, icon, children}) => (
+const Card = ({title, iconName, children}) => (
   <View style={styles.card}>
     <View style={styles.cardHeader}>
-      {icon ? <Text style={styles.cardIcon}>{icon}</Text> : null}
+      {iconName ? (
+        <Icon name={iconName} size={18} color={Colors.textPrimary} solid style={styles.cardIcon} />
+      ) : null}
       <Text style={styles.cardTitle}>{title}</Text>
     </View>
     {children}
@@ -71,20 +74,39 @@ const InvoiceDetailScreen = ({route, navigation}) => {
     }
   }, [invoiceNumber, token, navigation, refreshing]);
 
+  const openScanner = useCallback(() => {
+    navigation.navigate('Scanner');
+  }, [navigation]);
+
   useLayoutEffect(() => {
     navigation.setOptions({
+      headerStyle: {
+        overflow: 'visible',
+      },
       headerRight: () => (
         <View style={styles.headerButtonsWrap}>
+          <TouchableOpacity
+            onPress={openScanner}
+            activeOpacity={0.7}
+            style={[styles.headerBtn, styles.headerBtnIcon]}
+            accessibilityLabel="Scan new invoice">
+            <View style={styles.headerBtnCircle}>
+              <Icon name="qrcode" size={20} color={Colors.textPrimary} solid />
+            </View>
+          </TouchableOpacity>
           <TouchableOpacity
             onPress={handleRefresh}
             disabled={refreshing}
             activeOpacity={0.7}
-            style={[styles.headerBtn, styles.headerBtnRefresh]}>
-            {refreshing ? (
-              <ActivityIndicator size="small" color={Colors.textPrimary} />
-            ) : (
-              <Text style={styles.headerBtnRefreshLabel}>Refresh</Text>
-            )}
+            style={[styles.headerBtn, styles.headerBtnRefresh]}
+            accessibilityLabel="Refresh">
+            <View style={styles.headerBtnCircle}>
+              {refreshing ? (
+                <ActivityIndicator size="small" color={Colors.textPrimary} />
+              ) : (
+                <Icon name="sync-alt" size={20} color={Colors.textPrimary} solid />
+              )}
+            </View>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
@@ -92,13 +114,16 @@ const InvoiceDetailScreen = ({route, navigation}) => {
               logout();
             }}
             activeOpacity={0.7}
-            style={[styles.headerBtn, styles.headerBtnLogout]}>
-            <Text style={styles.headerBtnLogoutLabel}>Logout</Text>
+            style={[styles.headerBtn, styles.headerBtnLogout]}
+            accessibilityLabel="Logout">
+            <View style={styles.headerBtnCircle}>
+              <Icon name="sign-out-alt" size={20} color={Colors.white} solid />
+            </View>
           </TouchableOpacity>
         </View>
       ),
     });
-  }, [navigation, handleRefresh, refreshing, logout]);
+  }, [navigation, handleRefresh, refreshing, logout, openScanner]);
 
   const openAgreementPreview = async () => {
     if (!invoiceNumber) return;
@@ -178,14 +203,14 @@ const InvoiceDetailScreen = ({route, navigation}) => {
       {/* Customer and Amounts cards in one row */}
       <View style={styles.cardsRow}>
         <View style={[styles.halfCard, styles.halfCardFirst]}>
-          <Card title="Customer" icon="👤">
+          <Card title="Customer" iconName="user">
             <Row label="Name" value={customer.name} />
             <Row label="Phone" value={customer.phone} />
             <Row label="Address" value={customer.address} />
           </Card>
         </View>
         <View style={[styles.halfCard, styles.halfCardLast]}>
-          <Card title="Amounts" icon="💰">
+          <Card title="Amounts" iconName="coins">
             <Row label="Final total" value={amounts.final_total} />
             <Row label="Paid amount" value={amounts.paid_amount} />
             <Row label="Last balance" value={amounts.last_balance} />
@@ -196,7 +221,7 @@ const InvoiceDetailScreen = ({route, navigation}) => {
       </View>
 
       {/* Payment card */}
-      <Card title="Payment" icon="💳">
+      <Card title="Payment" iconName="credit-card">
         {paymentMethods.length > 0
           ? paymentMethods.map((item, index) => (
               <Row
@@ -211,7 +236,7 @@ const InvoiceDetailScreen = ({route, navigation}) => {
       {/* Progress card - shown below Payment */}
       {steps.current_step != null && (
         <View style={styles.cardSpacing}>
-          <Card title="Progress" icon="📋">
+          <Card title="Progress" iconName="clipboard-list">
           <Row
             label="Status"
             value={steps.is_completed ? 'Completed' : 'In progress'}
@@ -225,7 +250,7 @@ const InvoiceDetailScreen = ({route, navigation}) => {
                 style={styles.pdfButton}
                 onPress={openPdfInApp}
                 activeOpacity={0.85}>
-                <Text style={styles.pdfButtonIcon}>📄</Text>
+                <Icon name="file-pdf" size={20} color={Colors.white} solid style={styles.pdfButtonIcon} />
                 <Text style={styles.pdfButtonText}>View Invoice PDF</Text>
               </TouchableOpacity>
             </>
@@ -239,7 +264,7 @@ const InvoiceDetailScreen = ({route, navigation}) => {
                 style={styles.pdfButton}
                 onPress={openAgreementPdf}
                 activeOpacity={0.85}>
-                <Text style={styles.pdfButtonIcon}>📋</Text>
+                <Icon name="file-signature" size={20} color={Colors.white} solid style={styles.pdfButtonIcon} />
                 <Text style={styles.pdfButtonText}>View Agreement PDF</Text>
               </TouchableOpacity>
             </>
@@ -251,7 +276,7 @@ const InvoiceDetailScreen = ({route, navigation}) => {
       {/* Documents section - shown when completed */}
       {isCompleted && (documents.front || documents.back) && (
         <View style={styles.sectionSpacing}>
-          <Card title="Documents" icon="📄">
+          <Card title="Documents" iconName="file-alt">
           <View style={styles.documentsRow}>
             {documents.front?.file_url && (
               <TouchableOpacity
@@ -277,7 +302,7 @@ const InvoiceDetailScreen = ({route, navigation}) => {
       {/* Product Images section - shown when completed */}
       {isCompleted && productImages.length > 0 && (
         <View style={styles.sectionSpacing}>
-          <Card title="Product Images" icon="🖼️">
+          <Card title="Product Images" iconName="images">
             {productImages.map((product, productIndex) => (
               <View
                 key={productIndex}
@@ -350,7 +375,8 @@ const InvoiceDetailScreen = ({route, navigation}) => {
           </>
         ) : (
           <View style={styles.completedBadge}>
-            <Text style={styles.completedText}>✓ All steps completed</Text>
+            <Icon name="check-circle" size={20} color={Colors.success} solid style={styles.completedIcon} />
+            <Text style={styles.completedText}>All steps completed</Text>
           </View>
         )}
       </View>
@@ -370,36 +396,34 @@ const styles = StyleSheet.create({
   headerButtonsWrap: {
     flexDirection: 'row',
     alignItems: 'center',
-    // marginRight: -4,
+    overflow: 'visible',
   },
   headerBtn: {
-    minHeight: 36,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 18,
+    width: 35,
+    height: 35,
+    borderRadius: 22,
+    marginLeft: 6,
+    marginRight: 6,
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 3,
-    marginRight: 3,
-    
+  },
+  headerBtnCircle: {
+    width: 45,
+    height: 45,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  headerBtnIcon: {
+    backgroundColor: '#E8ECF1',
   },
   headerBtnRefresh: {
     backgroundColor: '#E8ECF1',
-    minWidth: 88,
-  },
-  headerBtnRefreshLabel: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: Colors.textPrimary,
   },
   headerBtnLogout: {
     backgroundColor: Colors.primary,
-    minWidth: 80,
-  },
-  headerBtnLogoutLabel: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: Colors.white,
   },
   hero: {
     backgroundColor: Colors.primary,
@@ -501,7 +525,6 @@ const styles = StyleSheet.create({
     borderBottomColor: '#EEEEEE',
   },
   cardIcon: {
-    fontSize: 18,
     marginRight: 8,
   },
   cardTitle: {
@@ -556,7 +579,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   pdfButtonIcon: {
-    fontSize: 20,
+    marginRight: 8,
   },
   pdfButtonText: {
     color: Colors.white,
@@ -589,11 +612,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   completedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
     alignSelf: 'flex-start',
     paddingVertical: 10,
     paddingHorizontal: 16,
     backgroundColor: '#E8F5E9',
     borderRadius: 10,
+  },
+  completedIcon: {
+    marginRight: 8,
   },
   completedText: {
     fontSize: 14,
